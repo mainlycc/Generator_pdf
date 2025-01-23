@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: 20,
     fontFamily: 'Roboto',
+    fontSize: 14,
   },
   detailsHeader: {
     backgroundColor: '#2563eb',
@@ -140,9 +141,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     color: '#000000',
   },
-  productCell: { width: '40%' },
+  productCell: { width: '35%' },
   materialCell: { width: '20%' },
-  groupCell: { width: '10%' },
+  groupCell: { width: '15%' },
   quantityCell: { width: '10%' },
   priceCell: { width: '20%' },
   discountBox: {
@@ -259,9 +260,12 @@ const OrdersPDF = ({ orders, clientData, discount }: OrdersPDFProps) => {
           </View>
 
           {/* Informacja o rabacie */}
-          {discount !== '0' && (
+          {discount && discount !== '0' && (
             <View style={styles.discountBox}>
               <Text style={styles.discountText}>CENY PO RABACIE - {discount}%</Text>
+              <Text style={styles.discountPrice}>
+                Rabat: {discount}% od ceny podstawowej
+              </Text>
             </View>
           )}
 
