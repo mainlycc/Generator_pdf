@@ -15,6 +15,13 @@ const styles = StyleSheet.create({
     height: '100%',
     opacity: 0.4,
   },
+  logo: {
+    position: 'absolute',
+    top: 30,
+    right: 30,
+    width: 150, // Dostosuj szerokość według potrzeb
+    zIndex: 1,
+  },
 });
 
 const PDFBackground = () => (
@@ -23,6 +30,11 @@ const PDFBackground = () => (
       src="background_A4.png" 
       style={styles.backgroundImage}
     />
+    <Image 
+      src="images.jpeg"
+      style={styles.logo}
+    />
   </View>
 );
+
 export default PDFBackground;
