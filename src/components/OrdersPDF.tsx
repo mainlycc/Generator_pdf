@@ -32,7 +32,7 @@ export interface OrdersPDFProps {
     offerNumber: string;
     offerDate: string;
   };
-  discount: string;
+  additionalInfo: string[];
 }
 
 // Style dla PDF
@@ -43,25 +43,32 @@ const styles = StyleSheet.create({
     padding: 30,
     fontFamily: 'Roboto',
   },
-  content: {
-    position: 'relative',
-    zIndex: 2,
-  },
   header: {
-    fontSize: 12,
-    marginBottom: 20,
-    fontFamily: 'Roboto',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 40,
+    position: 'relative',
+    height: 100, // Stała wysokość dla nagłówka
+  },
+  companyDetails: {
+    flex: 1,
+  },
+  logo: {
+    width: 150,
   },
   companyInfo: {
     marginBottom: 10,
     fontFamily: 'Roboto',
     color: '#000000',
+    fontSize: 12,
+  },
+  mainContent: {
+    flexGrow: 1,
   },
   title: {
     color: '#2563eb',
     fontSize: 24,
     marginBottom: 20,
-    marginTop: 20,
     textAlign: 'center',
     fontFamily: 'Roboto-Bold',
   },
@@ -76,20 +83,19 @@ const styles = StyleSheet.create({
     fontSize: 14,
     width: '100%',
     marginBottom: 20,
-    borderStyle: 'solid',
     borderWidth: 1,
-    borderColor: '#000',
+    borderColor: '#000000',
   },
   clientRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderBottomColor: '#000000',
   },
   clientLabelCell: {
     width: '30%',
     padding: 8,
     borderRightWidth: 1,
-    borderRightColor: '#000',
+    borderRightColor: '#000000',
     fontFamily: 'Roboto-Bold',
     color: '#000000',
   },
@@ -117,28 +123,30 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Bold',
     textAlign: 'center',
   },
+  tableContainer: {
+    width: 'auto',
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#000000',
+  },
   table: {
     width: 'auto',
-    borderStyle: 'solid',
-    borderWidth: 1,
-    borderColor: '#000',
-    marginBottom: 20,
   },
   tableRow: {
     flexDirection: 'row',
     borderBottomWidth: 1,
-    borderBottomColor: '#000',
+    borderBottomColor: '#000000',
   },
   tableHeader: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#ffffff',
     fontFamily: 'Roboto-Bold',
   },
   tableCell: {
-    fontSize: 12,
     padding: 8,
     borderRightWidth: 1,
-    borderRightColor: '#000',
+    borderRightColor: '#000000',
     fontFamily: 'Roboto',
+    fontSize: 12,
     color: '#000000',
   },
   productCell: { width: '35%' },
@@ -176,25 +184,49 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Roboto',
   },
+  pageNumber: {
+    position: 'absolute',
+    fontSize: 10,
+    bottom: 20,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    color: '#000000',
+  },
+  additionalProductRow: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#000000',
+  },
+  additionalProductCell: {
+    padding: 8,
+    borderRightWidth: 1,
+    borderRightColor: '#000000',
+    width: '100%',
+  },
 });
 
-const OrdersPDF = ({ orders, clientData, discount }: OrdersPDFProps) => {
+const OrdersPDF = ({ orders, clientData, additionalInfo }: OrdersPDFProps) => {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <PDFBackground />
         
-        <View style={styles.content}>
-          {/* Nagłówek */}
-          <View style={styles.header}>
+        {/* Stały nagłówek */}
+        <View style={styles.header} fixed>
+          <View style={styles.companyDetails}>
             <Text style={styles.companyInfo}>Czeremchowa 2a, 81-079 Gdynia</Text>
             <Text style={styles.companyInfo}>Nr kontaktowy: 530 338 118</Text>
             <Text style={styles.companyInfo}>Email: kzysko@rolety3miasto.pl</Text>
           </View>
+          <Image src="images.jpeg" style={styles.logo} />
+        </View>
 
-          {/* Tytuł */}
+        {/* Główna treść */}
+        <View style={styles.mainContent}>
           <Text style={styles.title}>OFERTA SPRZEDAŻOWA</Text>
-          <Text style={styles.subtitle}>W związku z wykonanym pomiarem przedstawiam następującą ofertę:</Text>
+          <Text style={styles.subtitle}>
+            W związku z wykonanym pomiarem przedstawiam następującą ofertę:
+          </Text>
 
           {/* Tabela z danymi klienta */}
           <View style={styles.clientTable}>
@@ -227,9 +259,9 @@ const OrdersPDF = ({ orders, clientData, discount }: OrdersPDFProps) => {
             <Text style={styles.detailsText}>SZCZEGÓŁY</Text>
           </View>
 
-          {/* Tabela */}
-          <View style={styles.table}>
-            <View style={[styles.tableRow, styles.tableHeader]}>
+          {/* Tabela produktów */}
+          <View style={styles.tableContainer}>
+            <View style={[styles.tableRow, styles.tableHeader]} fixed>
               <Text style={[styles.tableCell, styles.productCell]}>PRODUKT</Text>
               <Text style={[styles.tableCell, styles.materialCell]}>MATERIAŁ</Text>
               <Text style={[styles.tableCell, styles.groupCell]}>GRUPA</Text>
@@ -239,7 +271,7 @@ const OrdersPDF = ({ orders, clientData, discount }: OrdersPDFProps) => {
             
             {orders.map((order, orderIndex) => 
               Object.values(order.products).map((product, productIndex) => (
-                <View key={`${orderIndex}-${productIndex}`}>
+                <View key={`${orderIndex}-${productIndex}`} wrap={false}>
                   <View style={styles.tableRow}>
                     <Text style={[styles.tableCell, styles.productCell]}>{product.product}</Text>
                     <Text style={[styles.tableCell, styles.materialCell]}>{product.material}</Text>
@@ -248,7 +280,7 @@ const OrdersPDF = ({ orders, clientData, discount }: OrdersPDFProps) => {
                     <Text style={[styles.tableCell, styles.priceCell]}>{product.price} zł</Text>
                   </View>
                   {product.additionalProduct && (
-                    <View key={`${orderIndex}-${productIndex}-additional`} style={[styles.tableRow, { backgroundColor: '#f8f8f8' }]}>
+                    <View style={[styles.tableRow]} wrap={false}>
                       <Text style={[styles.tableCell, { width: '100%' }]}>
                         + {product.additionalProduct}
                       </Text>
@@ -259,23 +291,27 @@ const OrdersPDF = ({ orders, clientData, discount }: OrdersPDFProps) => {
             )}
           </View>
 
-          {/* Informacja o rabacie */}
-          {discount && discount !== '0' && (
-            <View style={styles.discountBox}>
-              <Text style={styles.discountText}>CENY PO RABACIE - {discount}%</Text>
-              <Text style={styles.discountPrice}>
-                Rabat: {discount}% od ceny podstawowej
-              </Text>
+          {/* Dodatkowe informacje - pokazywane tylko gdy są niepuste i checkbox jest zaznaczony */}
+          {additionalInfo.length > 0 && additionalInfo[0] && (
+            <View wrap={false}>
+              <Text style={styles.additionalInfoTitle}>DODATKOWE INFORMACJE:</Text>
+              <View style={styles.additionalInfo}>
+                {additionalInfo.map((info, index) => (
+                  <Text key={index}>{info}</Text>
+                ))}
+              </View>
             </View>
           )}
-
-          <Text style={styles.additionalInfoTitle}>DODATKOWE INFORMACJE:</Text>
-
-          <View style={styles.additionalInfo}>
-            <Text>PRZEDSTAWIONE CENY BRUTTO</Text>
-            <Text>CENA Z MONTAŻEM</Text>
-          </View>
         </View>
+
+        {/* Numerowanie stron */}
+        <Text 
+          style={styles.pageNumber} 
+          render={({ pageNumber, totalPages }) => 
+            totalPages > 1 ? `${pageNumber} / ${totalPages}` : ''
+          } 
+          fixed
+        />
       </Page>
     </Document>
   );

@@ -19,8 +19,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 30,
     right: 30,
-    width: 150, // Dostosuj szerokość według potrzeb
-    zIndex: 1,
+    width: 150,
+    height: 'auto',
+    objectFit: 'contain',
   },
 });
 

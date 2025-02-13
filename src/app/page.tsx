@@ -34,8 +34,9 @@ export default function Home() {
     offerNumber: new Date().getTime().toString().slice(-5),
     offerDate: new Date().toISOString().split('T')[0]
   });
-  const [discount, setDiscount] = useState('0');
   const [showDiscount, setShowDiscount] = useState(false);
+  const [showAdditionalInfo, setShowAdditionalInfo] = useState(true);
+  const [additionalInfo, setAdditionalInfo] = useState<string[]>(['']);
   const { register, handleSubmit, reset } = useForm<Order>();
   const [productRows, setProductRows] = useState([{ id: 0 }]);
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -79,6 +80,23 @@ export default function Home() {
   const handleRemoveProductRow = (id: number) => {
     if (productRows.length > 1) {
       setProductRows(productRows.filter(row => row.id !== id));
+    }
+  };
+
+  const handleAddInfoField = () => {
+    setAdditionalInfo([...additionalInfo, '']);
+  };
+
+  const handleInfoChange = (index: number, value: string) => {
+    const newInfo = [...additionalInfo];
+    newInfo[index] = value;
+    setAdditionalInfo(newInfo);
+  };
+
+  const handleRemoveInfoField = (index: number) => {
+    if (additionalInfo.length > 1) {
+      const newInfo = additionalInfo.filter((_, i) => i !== index);
+      setAdditionalInfo(newInfo);
     }
   };
 
@@ -274,49 +292,43 @@ export default function Home() {
                         type="button"
                         variant="outline"
                         onClick={handleAddProductRow}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-2 bg-[#4ade80] hover:bg-[#22c55e] text-white border-[#22c55e]"
                       >
                         <Plus className="h-4 w-4" />
                         Dodaj kolejny produkt
                       </Button>
                     </div>
 
-                    {/* Sekcja rabatu */}
-                    <div className="flex items-center space-x-2 mb-4">
-                      <Checkbox 
-                        id="showDiscount" 
-                        checked={showDiscount}
-                        onCheckedChange={(checked) => {
-                          setShowDiscount(checked as boolean);
-                          if (!checked) {
-                            setDiscount('0');
-                          }
-                        }}
-                      />
-                      <label
-                        htmlFor="showDiscount"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Uwzględnij rabat w wycenie
-                      </label>
-                    </div>
-
-                    {showDiscount && (
-                      <div className="flex items-center gap-2 mb-4">
-                        <label htmlFor="discount" className="font-semibold">
-                          Wysokość rabatu (%):
-                        </label>
-                        <input
-                          id="discount"
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={discount}
-                          onChange={(e) => setDiscount(e.target.value)}
-                          className="p-2 border rounded w-24 bg-gray-50 hover:bg-gray-100 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                    {/* Sekcja dodatkowych informacji */}
+                    <div className="space-y-4">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="showAdditionalInfo" 
+                          checked={showAdditionalInfo}
+                          onCheckedChange={(checked) => {
+                            setShowAdditionalInfo(checked as boolean);
+                          }}
                         />
+                        <label
+                          htmlFor="showAdditionalInfo"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          Dodatkowe informacje
+                        </label>
                       </div>
-                    )}
+
+                      {showAdditionalInfo && (
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={additionalInfo[0]}
+                            onChange={(e) => handleInfoChange(0, e.target.value)}
+                            placeholder="np. PRZEDSTAWIONE CENY BRUTTO"
+                            className="p-3 border rounded-md bg-gray-50 hover:bg-gray-100 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors w-full"
+                          />
+                        </div>
+                      )}
+                    </div>
 
                     <div className="flex justify-center">
                       <Button type="submit" className="px-8">
@@ -365,7 +377,7 @@ export default function Home() {
                         <OrdersPDF 
                           orders={orders} 
                           clientData={clientData} 
-                          discount={showDiscount ? discount : '0'} 
+                          additionalInfo={showAdditionalInfo && additionalInfo[0].trim() !== '' ? [additionalInfo[0]] : []} 
                         />
                       }>
                         {({ blob, url, loading }) => (
@@ -412,7 +424,7 @@ export default function Home() {
                   <OrdersPDF 
                     orders={orders} 
                     clientData={clientData} 
-                    discount={showDiscount ? discount : '0'} 
+                    additionalInfo={showAdditionalInfo && additionalInfo[0].trim() !== '' ? [additionalInfo[0]] : []} 
                   />
                 </PDFViewer>
               </div>
