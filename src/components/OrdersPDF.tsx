@@ -204,9 +204,23 @@ const styles = StyleSheet.create({
     borderRightColor: '#000000',
     width: '100%',
   },
+  totalRow: {
+    backgroundColor: '#f8f9fa',
+    borderTopWidth: 2,
+    borderTopColor: '#000000',
+  },
 });
 
 const OrdersPDF = ({ orders, clientData, additionalInfo }: OrdersPDFProps) => {
+  // Dodaj funkcję do obliczania sumy
+  const calculateTotal = () => {
+    return orders.reduce((total, order) => {
+      return total + Object.values(order.products).reduce((orderTotal, product) => {
+        return orderTotal + (product.price * product.quantity);
+      }, 0);
+    }, 0);
+  };
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -278,7 +292,7 @@ const OrdersPDF = ({ orders, clientData, additionalInfo }: OrdersPDFProps) => {
                     <Text style={[styles.tableCell, styles.materialCell]}>{product.material}</Text>
                     <Text style={[styles.tableCell, styles.groupCell]}>{product.group}</Text>
                     <Text style={[styles.tableCell, styles.quantityCell]}>{product.quantity}</Text>
-                    <Text style={[styles.tableCell, styles.priceCell]}>{product.price} zł</Text>
+                    <Text style={[styles.tableCell, styles.priceCell]}>{(product.price * product.quantity).toFixed(2)} zł</Text>
                   </View>
                   {product.additionalProduct && (
                     <View style={[styles.tableRow]} wrap={false}>
@@ -290,6 +304,14 @@ const OrdersPDF = ({ orders, clientData, additionalInfo }: OrdersPDFProps) => {
                 </View>
               ))
             )}
+
+            {/* Wiersz z sumą */}
+            <View style={[styles.tableRow, styles.totalRow]} wrap={false}>
+              <Text style={[styles.tableCell, { width: '80%', fontFamily: 'Roboto-Bold' }]}>RAZEM</Text>
+              <Text style={[styles.tableCell, { width: '20%', fontFamily: 'Roboto-Bold' }]}>
+                {calculateTotal().toFixed(2)} zł
+              </Text>
+            </View>
           </View>
 
           {/* Dodatkowe informacje - pokazywane tylko gdy są niepuste i checkbox jest zaznaczony */}
