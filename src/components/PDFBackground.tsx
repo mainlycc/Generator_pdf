@@ -19,9 +19,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 30,
     right: 30,
-    width: 150,
-    height: 'auto',
-    objectFit: 'contain',
+    width: 180,
+    height: 60,
   },
 });
 
